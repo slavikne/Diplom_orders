@@ -18,16 +18,18 @@ class CustomUserAdmin(UserAdmin):
         ('Permissions', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
-        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+        # ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
     list_display = ('email', 'first_name', 'last_name', 'is_staff')
 
 
+
+
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
-    pass
-
-
+     list_display = ('name', 'url', 'user', 'state')
+#
+#
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     pass
@@ -71,3 +73,4 @@ class ContactAdmin(admin.ModelAdmin):
 @admin.register(ConfirmEmailToken)
 class ConfirmEmailTokenAdmin(admin.ModelAdmin):
     list_display = ('user', 'key', 'created_at',)
+

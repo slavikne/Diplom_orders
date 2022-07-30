@@ -1,5 +1,5 @@
-from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -23,7 +23,6 @@ USER_TYPE_CHOICES = (
 )
 
 
-# Create your models here.
 
 
 class UserManager(BaseUserManager):
@@ -62,7 +61,10 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractUser):
+
+
+
+class User(AbstractBaseUser, PermissionsMixin):
     """
     Стандартная модель пользователей
     """
@@ -71,10 +73,12 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     email = models.EmailField(_('email address'), unique=True)
+    first_name = models.CharField(verbose_name='Имя', max_length=35, blank=True)
+    last_name = models.CharField(verbose_name='Фамилия', max_length=35, blank=True)
     company = models.CharField(verbose_name='Компания', max_length=40, blank=True)
     position = models.CharField(verbose_name='Должность', max_length=40, blank=True)
     username_validator = UnicodeUsernameValidator()
-    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     username = models.CharField(
         _('username'),
         max_length=150,
@@ -98,7 +102,7 @@ class User(AbstractUser):
         return f'{self.first_name} {self.last_name}'
 
     def has_perm(self, perm, obj=None):
-        return self.is_admin
+        return self.is_staff
 
     def has_module_perms(self, app_label):
         return True
