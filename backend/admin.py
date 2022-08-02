@@ -28,11 +28,12 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
      list_display = ('name', 'url', 'user', 'state')
-#
-#
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    pass
+     pass
+
 
 
 @admin.register(Product)

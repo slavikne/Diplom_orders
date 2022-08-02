@@ -22,10 +22,14 @@ from backend.serializers import UserSerializer, CategorySerializer, ShopSerializ
 from backend.signals import new_user_registered, new_order
 
 
+from pprint import pprint
+
+
 class RegisterAccount(APIView):
     """
     Для регистрации покупателей
     """
+
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
 
@@ -65,6 +69,7 @@ class ConfirmAccount(APIView):
     """
     Класс для подтверждения почтового адреса
     """
+
     # Регистрация методом POST
     def post(self, request, *args, **kwargs):
 
@@ -130,8 +135,11 @@ class LoginAccount(APIView):
     """
     Класс для авторизации пользователей
     """
+
     # Авторизация методом POST
     def post(self, request, *args, **kwargs):
+
+        print(request.data)
 
         if {'email', 'password'}.issubset(request.data):
             user = authenticate(request, username=request.data['email'], password=request.data['password'])
@@ -167,6 +175,7 @@ class ProductInfoView(APIView):
     """
     Класс для поиска товаров
     """
+
     def get(self, request, *args, **kwargs):
 
         query = Q(shop__state=True)
@@ -288,7 +297,9 @@ class PartnerUpdate(APIView):
     """
     Класс для обновления прайса от поставщика
     """
+
     def post(self, request, *args, **kwargs):
+        print(request.user)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
@@ -296,6 +307,7 @@ class PartnerUpdate(APIView):
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
         url = request.data.get('url')
+        print(url)
         if url:
             validate_url = URLValidator()
             try:
@@ -304,10 +316,13 @@ class PartnerUpdate(APIView):
                 return JsonResponse({'Status': False, 'Error': str(e)})
             else:
                 stream = get(url).content
+        # with open('shop1.yaml', "r", encoding="utf-8") as stream:
+        #     # читаем документ YAML
+        #     data = load_yaml(stream, Loader=Loader)
 
                 data = load_yaml(stream, Loader=Loader)
-
                 shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
+                print(shop)
                 for category in data['categories']:
                     category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
                     category_object.shops.add(shop.id)
@@ -373,6 +388,7 @@ class PartnerOrders(APIView):
     """
     Класс для получения заказов поставщиками
     """
+
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
