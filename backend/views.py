@@ -8,19 +8,23 @@ from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.http import JsonResponse
 from requests import get
+from rest_framework import generics
 from rest_framework.authtoken.models import Token
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from json import loads as load_json
+
+from rest_framework.viewsets import ModelViewSet
 from yaml import load as load_yaml, Loader
+from django_filters.rest_framework import DjangoFilterBackend
 
 from backend.models import Shop, Category, Product, ProductInfo, Parameter, ProductParameter, Order, OrderItem, \
     Contact, ConfirmEmailToken
 from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductInfoSerializer, \
-    OrderItemSerializer, OrderSerializer, ContactSerializer
+    OrderItemSerializer, OrderSerializer, ContactSerializer, ProductSerializer
 from backend.signals import new_user_registered, new_order
-
 
 from pprint import pprint
 
@@ -188,7 +192,7 @@ class ProductInfoView(APIView):
         if category_id:
             query = query & Q(product__category_id=category_id)
 
-        # фильтруем и отбрасываем дуликаты
+        # фильтруем и отбрасываем дупликаты
         queryset = ProductInfo.objects.filter(
             query).select_related(
             'shop', 'product__category').prefetch_related(
@@ -197,6 +201,18 @@ class ProductInfoView(APIView):
         serializer = ProductInfoSerializer(queryset, many=True)
 
         return Response(serializer.data)
+
+
+class ProductCard(generics.ListAPIView):
+
+    """Класс для показа карточки товара"""
+
+    serializer_class = ProductInfoSerializer
+
+    def get_queryset(self):
+        product_info_id = self.kwargs['id']
+        return ProductInfo.objects.filter(id=product_info_id)
+
 
 
 class BasketView(APIView):
@@ -306,47 +322,47 @@ class PartnerUpdate(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-        url = request.data.get('url')
-        print(url)
-        if url:
-            validate_url = URLValidator()
-            try:
-                validate_url(url)
-            except ValidationError as e:
-                return JsonResponse({'Status': False, 'Error': str(e)})
-            else:
-                stream = get(url).content
-        # with open('shop1.yaml', "r", encoding="utf-8") as stream:
-        #     # читаем документ YAML
-        #     data = load_yaml(stream, Loader=Loader)
+        # url = request.data.get('url')
+        # print(url)
+        # if url:
+        #     validate_url = URLValidator()
+        #     try:
+        #         validate_url(url)
+        #     except ValidationError as e:
+        #         return JsonResponse({'Status': False, 'Error': str(e)})
+        #     else:
+        #         stream = get(url).content
+        with open('shop2.yaml', "r", encoding="utf-8") as stream:
+            # читаем документ YAML
+            data = load_yaml(stream, Loader=Loader)
 
-                data = load_yaml(stream, Loader=Loader)
-                shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
-                print(shop)
-                for category in data['categories']:
-                    category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
-                    category_object.shops.add(shop.id)
-                    category_object.save()
-                ProductInfo.objects.filter(shop_id=shop.id).delete()
-                for item in data['goods']:
-                    product, _ = Product.objects.get_or_create(name=item['name'], category_id=item['category'])
+        # data = load_yaml(stream, Loader=Loader)
+        shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
+        print(shop)
+        for category in data['categories']:
+            category_object, _ = Category.objects.get_or_create(id=category['id'], name=category['name'])
+            category_object.shops.add(shop.id)
+            category_object.save()
+        ProductInfo.objects.filter(shop_id=shop.id).delete()
+        for item in data['goods']:
+            product, _ = Product.objects.get_or_create(name=item['name'], category_id=item['category'])
 
-                    product_info = ProductInfo.objects.create(product_id=product.id,
-                                                              external_id=item['id'],
-                                                              model=item['model'],
-                                                              price=item['price'],
-                                                              price_rrc=item['price_rrc'],
-                                                              quantity=item['quantity'],
-                                                              shop_id=shop.id)
-                    for name, value in item['parameters'].items():
-                        parameter_object, _ = Parameter.objects.get_or_create(name=name)
-                        ProductParameter.objects.create(product_info_id=product_info.id,
-                                                        parameter_id=parameter_object.id,
-                                                        value=value)
+            product_info = ProductInfo.objects.create(product_id=product.id,
+                                                      external_id=item['id'],
+                                                      model=item['model'],
+                                                      price=item['price'],
+                                                      price_rrc=item['price_rrc'],
+                                                      quantity=item['quantity'],
+                                                      shop_id=shop.id)
+            for name, value in item['parameters'].items():
+                parameter_object, _ = Parameter.objects.get_or_create(name=name)
+                ProductParameter.objects.create(product_info_id=product_info.id,
+                                                parameter_id=parameter_object.id,
+                                                value=value)
 
-                return JsonResponse({'Status': True})
+        return JsonResponse({'Status': True})
 
-        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+        # return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
 class PartnerState(APIView):
