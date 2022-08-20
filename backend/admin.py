@@ -43,7 +43,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductInfo)
 class ProductInfoAdmin(admin.ModelAdmin):
-    pass
+    # pass
+    list_display = ['model']
 
 
 @admin.register(Parameter)
@@ -63,7 +64,13 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    pass
+    # pass
+    # model = Product
+    # fieldsets = ({'fields':('model', 'external_id', 'product', 'shop', 'quantity', 'price', 'price_rrc')})
+
+    list_display = ['id']
+
+# ((None, {'fields': ('email', 'password', 'type')})
 
 
 @admin.register(Contact)

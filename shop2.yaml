@@ -1,0 +1,81 @@
+shop: МТС
+categories:
+  - id: 224
+    name: Смартфоны
+  - id: 15
+    name: Аксессуары
+  - id: 1
+    name: Flash-накопители
+
+goods:
+  - id: 4216254
+    category: 224
+    model: apple/iphone/xs-max
+    name: Смартфон Apple iPhone XS Max 512GB (золотистый)
+    price: 105000
+    price_rrc: 110990
+    quantity: 14
+    parameters:
+      "Диагональ (дюйм)": 6.5
+      "Разрешение (пикс)": 2688x1242
+      "Встроенная память (Гб)": 512
+      "Цвет": золотистый
+  - id: 4216343
+    category: 224
+    model: apple/iphone/xr
+    name: Смартфон Apple iPhone XR 256GB (красный)
+    price: 63000
+    price_rrc: 66990
+    quantity: 9
+    parameters:
+      "Диагональ (дюйм)": 6.1
+      "Разрешение (пикс)": 1792x828
+      "Встроенная память (Гб)": 256
+      "Цвет": красный
+  - id: 4216296
+    category: 224
+    model: apple/iphone/xr
+    name: Смартфон Apple iPhone XR 256GB (черный)
+    price: 67000
+    price_rrc: 70990
+    quantity: 5
+    parameters:
+      "Диагональ (дюйм)": 6.1
+      "Разрешение (пикс)": 1792x828
+      "Встроенная память (Гб)": 256
+      "Цвет": черный
+  - id: 4672634
+    category: 224
+    model: apple/iphone/xr
+    name: Смартфон Apple iPhone XR 128GB (синий)
+    price: 60000
+    price_rrc: 64990
+    quantity: 7
+    parameters:
+      "Диагональ (дюйм)": 6.1
+      "Разрешение (пикс)": 1792x828
+      "Встроенная память (Гб)": 256
+      "Цвет": синий
+  - id: 4672098
+    category: 1
+    model: Ultra Flair
+    name: Флешка USB Sandisk Cruzer Ultra Flair
+    price: 590
+    price_rrc: 650
+    quantity: 10
+    parameters:
+      "Интерфейс": USB3.0
+      "Материал корпуса": металл
+      "Встроенная память (Гб)": 32
+      "Цвет": серебристый
+  - id: 4677584
+    category: 15
+    model: Apple/Clear Case with MagSafe
+    name: Clear Case with MagSafe
+    price: 3999
+    price_rrc: 4290
+    quantity: 5
+    parameters:
+      "Назначение": Apple iPhone 13
+      "Материал корпуса": поликарбонат
+      "Цвет": прозрачный

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from distutils.util import strtobool
 
 from django.contrib.auth import authenticate
@@ -211,6 +212,7 @@ class ProductCard(generics.ListAPIView):
 
     def get_queryset(self):
         product_info_id = self.kwargs['id']
+
         return ProductInfo.objects.filter(id=product_info_id)
 
 
@@ -222,8 +224,10 @@ class BasketView(APIView):
 
     # получить корзину
     def get(self, request, *args, **kwargs):
+        print(request.data)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+        print("Корзина: ", request.user)
         basket = Order.objects.filter(
             user_id=request.user.id, state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
@@ -231,6 +235,7 @@ class BasketView(APIView):
             total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
 
         serializer = OrderSerializer(basket, many=True)
+        pprint(serializer.data)
         return Response(serializer.data)
 
     # редактировать корзину
@@ -243,7 +248,7 @@ class BasketView(APIView):
             try:
                 items_dict = load_json(items_sting)
             except ValueError:
-                JsonResponse({'Status': False, 'Errors': 'Неверный формат запроса'})
+                JsonResponse({'Status': False, 'Errors': 'Neverniy format zaprosa   Неверный формат запроса'})
             else:
                 basket, _ = Order.objects.get_or_create(user_id=request.user.id, state='basket')
                 objects_created = 0
@@ -322,21 +327,21 @@ class PartnerUpdate(APIView):
         if request.user.type != 'shop':
             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
 
-        # url = request.data.get('url')
-        # print(url)
-        # if url:
-        #     validate_url = URLValidator()
-        #     try:
-        #         validate_url(url)
-        #     except ValidationError as e:
-        #         return JsonResponse({'Status': False, 'Error': str(e)})
-        #     else:
-        #         stream = get(url).content
-        with open('shop2.yaml', "r", encoding="utf-8") as stream:
-            # читаем документ YAML
-            data = load_yaml(stream, Loader=Loader)
+        url = request.data.get('url')
+        print(url)
+        if url:
+            validate_url = URLValidator()
+            try:
+                validate_url(url)
+            except ValidationError as e:
+                return JsonResponse({'Status': False, 'Error': str(e)})
+            else:
+                stream = get(url).content
+        # with open('shop2.yaml', "r", encoding="utf-8") as stream:
+        #     # читаем документ YAML
+        #     data = load_yaml(stream, Loader=Loader)
 
-        # data = load_yaml(stream, Loader=Loader)
+        data = load_yaml(stream, Loader=Loader)
         shop, _ = Shop.objects.get_or_create(name=data['shop'], user_id=request.user.id)
         print(shop)
         for category in data['categories']:
@@ -496,11 +501,12 @@ class ContactView(APIView):
 
 class OrderView(APIView):
     """
-    Класс для получения и размешения заказов пользователями
+    Класс для получения и размещения заказов пользователями
     """
 
     # получить мои заказы
     def get(self, request, *args, **kwargs):
+        print(request.user)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
         order = Order.objects.filter(
@@ -514,11 +520,12 @@ class OrderView(APIView):
 
     # разместить заказ из корзины
     def post(self, request, *args, **kwargs):
+        print(request.data)
         if not request.user.is_authenticated:
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
 
         if {'id', 'contact'}.issubset(request.data):
-            if request.data['id'].isdigit():
+            # if request.data['id'].isdigit():
                 try:
                     is_updated = Order.objects.filter(
                         user_id=request.user.id, id=request.data['id']).update(
@@ -529,7 +536,7 @@ class OrderView(APIView):
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
-                        # new_order.send(sender=self.__class__, user_id=request.user.id)
+                        new_order.send(sender=self.__class__, user_id=request.user.id)
                         return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
