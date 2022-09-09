@@ -4,11 +4,12 @@ from django_rest_passwordreset.views import reset_password_request_token, reset_
 
 from backend.views import PartnerUpdate, RegisterAccount, LoginAccount, CategoryView, ShopView, ProductInfoView, \
     BasketView, \
-    AccountDetails, ContactViewSet, OrderView, PartnerState, PartnerOrders, ConfirmAccount, ProductCard
+    AccountDetails, ContactViewSet, OrderViewSet, PartnerState, PartnerOrders, ConfirmAccount, ProductCard
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register('contact', ContactViewSet)
+router.register('user/contact', ContactViewSet)
+router.register('order', OrderViewSet)
 
 app_name = 'backend'
 
@@ -19,7 +20,8 @@ urlpatterns = [
     path('user/register', RegisterAccount.as_view(), name='user-register'),
     path('user/register/confirm', ConfirmAccount.as_view(), name='user-register-confirm'),
     path('user/details', AccountDetails.as_view(), name='user-details'),
-    path('user/', include(router.urls), name='user-contact'),
+    # path('user/', include(router.urls), name='user-contact'),
+    path('', include(router.urls)),
     path('user/login', LoginAccount.as_view(), name='user-login'),
     path('user/password_reset', reset_password_request_token, name='password-reset'),
     path('user/password_reset/confirm', reset_password_confirm, name='password-reset-confirm'),
@@ -28,5 +30,5 @@ urlpatterns = [
     path('products', ProductInfoView.as_view(), name='shops'),
     re_path('product_card/(?P<id>.+)/$', ProductCard.as_view(), name='product-card'),
     path('basket', BasketView.as_view(), name='basket'),
-    path('order', OrderView.as_view(), name='order'),
+    # path('order', OrderView.as_view(), name='order'),
 ]
