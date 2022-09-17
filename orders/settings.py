@@ -44,7 +44,20 @@ INSTALLED_APPS = [
     'django_filters',
     # 'backend',
     'orders',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 ]
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Diplom project',
+    'DESCRIPTION': 'API сервис заказа товаров для розничных сетей',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -173,7 +186,8 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'user': '20/minute',
         'anon': '5/minute'
-    }
+    },
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
 }
 
 

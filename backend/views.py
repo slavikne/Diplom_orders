@@ -31,6 +31,10 @@ from .permissions import IsOwnerOrReadOnly, IsAdminOrOwner
 from pprint import pprint
 
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+
+
 class RegisterAccount(APIView):
     """
     Для регистрации покупателей
@@ -436,6 +440,7 @@ class ContactViewSet(ModelViewSet):
     """
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
+
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
