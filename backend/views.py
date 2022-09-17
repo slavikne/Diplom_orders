@@ -369,10 +369,70 @@ class PartnerUpdate(APIView):
         # return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
+# class PartnerState(APIView):
+#     """
+#     Класс для работы со статусом поставщика
+#     """
+#
+#     # получить текущий статус
+#     def get(self, request, *args, **kwargs):
+#         if not request.user.is_authenticated:
+#             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+#
+#         if request.user.type != 'shop':
+#             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+#
+#         shop = request.user.shop
+#         serializer = ShopSerializer(shop)
+#         return Response(serializer.data)
+#
+#     # изменить текущий статус
+#     def post(self, request, *args, **kwargs):
+#         if not request.user.is_authenticated:
+#             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+#
+#         if request.user.type != 'shop':
+#             return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+#         state = request.data.get('state')
+#         if state:
+#             try:
+#                 Shop.objects.filter(user_id=request.user.id).update(state=strtobool(state))
+#                 return JsonResponse({'Status': True})
+#             except ValueError as error:
+#                 return JsonResponse({'Status': False, 'Errors': str(error)})
+#
+#         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
 class PartnerState(APIView):
     """
     Класс для работы со статусом поставщика
     """
+#     queryset = Shop.objects.all()
+#     serializer_class = ShopSerializer
+#
+#     def perform_create(self, serializer):
+#         serializer.save(user=self.request.user)
+#
+#     def get_permissions(self):
+#         """Получение прав для действий"""
+#
+#         if self.action in [ "update"]:
+#             return [IsAuthenticated()]
+#
+#         return []
+#
+#     def get_queryset(self):
+#         qs = Shop.objects.all()
+#         if self.request.user.type != 'shop':
+#             qs = []
+#
+#         elif self.request.user.is_staff:
+#             qs = Shop.objects.all().order_by('id')
+#
+#         else:
+#             qs = Shop.objects.filter(Q(user=self.request.user)).order_by('id')
+#
+#         return qs
 
     # получить текущий статус
     def get(self, request, *args, **kwargs):
@@ -402,6 +462,9 @@ class PartnerState(APIView):
                 return JsonResponse({'Status': False, 'Errors': str(error)})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+
+
 
 
 class PartnerOrders(APIView):
